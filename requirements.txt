@@ -1,0 +1,11 @@
+# tested with Python 3.11
+ultralytics>=8.4,<9
+torch>=2.6
+torchvision>=0.21
+opencv-python>=4.10
+numpy>=2.0
+scipy>=1.13
+pillow>=11
+matplotlib>=3.9
+filelock
+packaging

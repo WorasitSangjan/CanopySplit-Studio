@@ -1,0 +1,1450 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CanopySplit Studio</title>
+<link rel="preload" href="/assets/source-sans-3.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face {
+  font-family: "Source Sans 3";
+  src: url("/assets/source-sans-3.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+}
+:root {
+  color-scheme: light;
+  --bg: #f2f6f3;
+  --panel: #ffffff;
+  --sunken: #ebf1ed;
+  --ink: #172e25;
+  --ink2: #364e43;
+  --muted: #54695e;
+  --disabled: #667a6e;
+  --rule: #d6e0d9;
+  --control-rule: #819387;
+  --accent: #175b43;
+  --accent-hover: #104833;
+  --accent-bg: #e4f0e8;
+  --ok: #245d43;
+  --ok-bg: #e7f2e9;
+  --warn: #714700;
+  --warn-bg: #faf0d9;
+  --bad: #a32f37;
+  --canvas: #1d2c25;
+  --canvas-text: #e7f0e9;
+  --canvas-muted: #b8cbbf;
+  --canvas-alert: #ffb7b4;
+  --font-ui: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --text-small: 0.875rem;
+  --text-compact: 0.8125rem;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --gutter: clamp(16px, 3vw, 32px);
+  --control-height: 40px;
+  --control-radius: 8px;
+  --panel-radius: 14px;
+  --shadow-dialog: 0 16px 48px rgba(20, 44, 32, .19);
+  font-family: var(--font-ui);
+  font-size: 100%;
+  line-height: 1.45;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+::selection { background: #c7e3cf; color: var(--ink); }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--ink); }
+body { display: flex; flex-direction: column; }
+a { color: var(--accent); text-underline-offset: .18em; }
+a:hover { color: var(--accent-hover); }
+header {
+  display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--space-3) var(--space-6);
+  padding: 0 var(--gutter); background: var(--panel); border-bottom: 1px solid var(--rule); min-height: 64px;
+}
+header h1 { align-self: center; margin: 0; font-size: 1.375rem; line-height: 1.1; font-weight: 700; letter-spacing: -.02em; }
+.brand-edition { color: var(--muted); font-weight: 500; }
+nav { display: flex; gap: var(--space-1); }
+nav button {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-width: 0; padding: 0 var(--space-4); border: 0; border-bottom: 3px solid transparent;
+  border-radius: 0; background: transparent; color: var(--muted); font-weight: 600; white-space: nowrap;
+}
+nav button:hover:not(:disabled) { background: var(--bg); }
+nav button.on, nav button.on:hover:not(:disabled) { background: var(--accent-bg); color: var(--accent); border-bottom-color: var(--accent); }
+nav button:disabled { background: transparent; color: var(--disabled); }
+nav button:focus-visible { outline-offset: -4px; }
+nav .n {
+  display: grid; place-items: center; width: 21px; height: 21px; flex: none; border-radius: 50%;
+  background: var(--sunken); color: var(--ink2); font-size: var(--text-compact); font-variant-numeric: tabular-nums;
+}
+nav button.on .n { background: var(--accent); color: var(--panel); }
+#next {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--gutter); background: var(--ok-bg); color: var(--ok);
+  border-bottom: 1px solid var(--rule); font-size: var(--text-small);
+}
+#next.warn { background: var(--warn-bg); color: var(--warn); }
+#next.warn .link { color: var(--warn); }
+.run-name { font-size: 1rem; overflow-wrap: anywhere; }
+main { flex: 1; min-height: 0; position: relative; }
+.tab { position: absolute; inset: 0; overflow: auto; }
+.page {
+  max-width: 52rem; margin: 0 auto; padding: var(--space-6) var(--gutter) 48px;
+  display: grid; gap: var(--space-5);
+}
+.card {
+  display: grid; gap: var(--space-4); min-width: 0;
+  padding: 24px; background: var(--panel);
+  border: 1px solid var(--rule); border-radius: var(--panel-radius);
+}
+.card h2, .modal .head h2 { margin: 0; font-size: 1.75rem; line-height: 1.18; font-weight: 700; letter-spacing: -.02em; }
+.card h3 { margin: 0; font-size: 1.125rem; line-height: 1.24; font-weight: 650; }
+.card p { margin: 0; color: var(--ink2); }
+.card .small { color: var(--muted); }
+#r-title { font-size: clamp(2rem, 4vw, 2.375rem); line-height: 1.12; overflow-wrap: anywhere; }
+.setup { display: grid; gap: var(--space-2); padding: var(--space-3); border-radius: var(--control-radius); background: var(--warn-bg); }
+.setup-line { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.setup .setup-status { color: var(--warn); font-weight: 650; }
+.setup-list { display: grid; gap: var(--space-2); margin: 0; padding-inline-start: 20px; font-size: var(--text-small); }
+.setup-list span { overflow-wrap: anywhere; color: var(--ink2); }
+.pick, .diameter-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2); }
+.dataset-guide, .measurements { display: grid; gap: var(--space-2); }
+.dataset-example {
+  margin: 0; padding: var(--space-3) var(--space-4); overflow: auto; border-radius: var(--control-radius);
+  background: var(--sunken); color: var(--ink);
+}
+.dataset-example code { font: var(--text-compact)/1.6 var(--font-mono); }
+.dataset-notes, .summary-options { padding-inline-start: 20px; color: var(--ink2); }
+.dataset-notes { display: grid; gap: var(--space-1); margin: 0; }
+.field { display: grid; min-width: 0; gap: var(--space-1); }
+.field label { font-weight: 600; }
+.field p[data-error] { color: var(--bad); font-weight: 600; }
+.measurement-label { display: flex; align-items: center; gap: var(--space-2); min-height: 28px; }
+button.measurement-help {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; min-height: 0; padding: 0;
+  border-radius: 50%; color: var(--accent); font-size: var(--text-small); font-weight: 700;
+}
+.measurement-help[aria-expanded="true"] { background: var(--accent-bg); border-color: var(--accent); }
+.card p.measurement-definition { padding: var(--space-3) var(--space-4); background: var(--accent-bg); border-radius: var(--control-radius); }
+.measure-diameter { width: min(18rem, 100%); }
+.small { font-size: var(--text-small); color: var(--muted); }
+input[type=text], input[type=number], select {
+  width: 100%; min-width: 0; min-height: var(--control-height); padding: 7px 11px; font: inherit;
+  border: 1px solid var(--control-rule); border-radius: var(--control-radius); background: var(--panel);
+  color: var(--ink); caret-color: var(--accent);
+}
+input[type=number] { font-variant-numeric: tabular-nums; }
+input[readonly] { background: var(--bg); }
+input::placeholder { color: var(--muted); opacity: 1; }
+input[type=checkbox], input[type=range] { accent-color: var(--accent); }
+button {
+  min-height: var(--control-height); padding: 6px var(--space-3); font: inherit; font-weight: 600;
+  border: 1px solid var(--control-rule); border-radius: var(--control-radius); background: var(--panel);
+  color: var(--ink); cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--accent); background: var(--bg); }
+button.on, button.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+button.on:hover:not(:disabled), button.primary:hover:not(:disabled) { background: var(--accent-hover); color: var(--panel); }
+button.big { justify-self: start; padding-inline: var(--space-5); }
+button.link { min-height: 26px; padding: 0; border: 0; background: transparent; color: var(--accent); text-decoration: underline; text-underline-offset: .18em; }
+button.link:hover:not(:disabled) { background: transparent; color: var(--accent-hover); }
+button:disabled { border-color: var(--rule); background: var(--sunken); color: var(--muted); cursor: default; }
+:where(a, button, input, select, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details summary { cursor: pointer; color: var(--ink2); font-size: var(--text-small); }
+pre.log {
+  margin: 0; padding: var(--space-3) var(--space-4); max-height: 260px; overflow: auto;
+  white-space: pre-wrap; overflow-wrap: anywhere; font: var(--text-compact)/1.6 var(--font-mono);
+  background: var(--canvas); color: var(--canvas-text); border-radius: var(--control-radius);
+}
+.done-msg {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4); border-radius: var(--control-radius); background: var(--ok-bg); color: var(--ok);
+}
+#r-recalc { background: var(--warn-bg); color: var(--warn); }
+.path { font: var(--text-compact)/1.45 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr)); gap: var(--space-3) var(--space-4); }
+.stat { padding: var(--space-2) 0; border-block-end: 1px solid var(--rule); }
+.stat .k { font-size: var(--text-small); color: var(--muted); }
+.stat .v { font-size: 1.625rem; line-height: 1.1; font-weight: 650; font-variant-numeric: tabular-nums; }
+.summary-options { display: grid; min-width: 0; gap: var(--space-2); }
+.summary-picker { display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.summary-picker .field { width: min(21rem, 100%); }
+.summary-picker .link { margin-block-end: 7px; }
+.summary-checks { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.summary-checks label { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; cursor: pointer; }
+.summary-checks input { margin: 0; }
+.percentile-fields { width: min(20rem, 100%); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+#tab-results .page { max-width: 66rem; }
+.summary-tools { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); }
+.summary-tools .field { width: min(23rem, 100%); }
+.summary-scroll { overflow-x: auto; border-radius: var(--control-radius); border: 1px solid var(--rule); }
+.summary-scroll table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+.summary-scroll th, .summary-scroll td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+.summary-scroll th { background: var(--sunken); color: var(--ink2); font-weight: 650; }
+.summary-scroll td { color: var(--ink); }
+.summary-scroll tr:last-child td { border-bottom: 0; }
+.summary-scroll tbody tr:hover { background: var(--bg); }
+.summary-scroll th:first-child, .summary-scroll td:first-child { text-align: left; }
+.summary-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chart-controls { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--space-3); width: min(34rem, 100%); }
+#chart-view img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: var(--control-radius); background: var(--panel); }
+
+.split { position: absolute; inset: 0; display: grid; grid-template-columns: 14rem minmax(0, 1fr) 15rem; }
+.split.two { grid-template-columns: 14rem minmax(0, 1fr); }
+aside { min-width: 0; background: var(--panel); overflow: auto; border-inline-end: 1px solid var(--rule); }
+aside.right { border-inline-end: 0; border-inline-start: 1px solid var(--rule); }
+aside h3 { margin: var(--space-4) var(--space-4) var(--space-2); color: var(--ink2); font-size: var(--text-small); font-weight: 700; }
+button.it {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--space-2);
+  padding: var(--space-2) var(--space-4); border: 0; border-radius: 0;
+  background: transparent; color: var(--ink); font-weight: 500; text-align: start; overflow-wrap: anywhere;
+}
+button.it:hover { background: var(--bg); }
+button.it.cur { background: var(--accent-bg); color: var(--accent); font-weight: 650; }
+button.it:focus-visible { outline-offset: -3px; }
+.chip { padding: 2px var(--space-2); border-radius: 1rem; font-size: var(--text-compact); font-weight: 650; white-space: nowrap; }
+.chip.todo { background: var(--warn-bg); color: var(--warn); }
+.chip.done { background: var(--ok-bg); color: var(--ok); }
+.sw { display: inline-block; width: 14px; height: 14px; flex: none; border-radius: 3px; }
+.plant { display: flex; align-items: center; gap: var(--space-2); }
+.area { color: var(--muted); font-size: var(--text-small); font-variant-numeric: tabular-nums; }
+.flag { color: var(--bad); font-weight: 700; }
+.viewer { display: grid; align-content: start; gap: var(--space-3); min-width: 0; padding: var(--space-4); overflow: auto; background: var(--canvas); }
+.viewer img { display: block; width: 100%; border-radius: var(--control-radius); }
+.viewer .bar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); color: var(--canvas-text); }
+.viewer .legend { color: var(--canvas-muted); font-size: var(--text-small); }
+.viewer-alert { color: var(--canvas-alert); }
+.qc-navigation { display: flex; gap: var(--space-2); margin-inline-start: auto; }
+.qc-arrow { width: var(--control-height); padding: 0; }
+.qc-arrow::before { content: ""; display: inline-block; width: 8px; height: 8px; border-block-start: 2px solid; border-inline-end: 2px solid; transform: rotate(45deg); }
+.qc-arrow.previous::before { transform: rotate(225deg); }
+#qc-view button[aria-pressed="true"] { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-bg); }
+.viewer button:focus-visible { outline-color: var(--canvas-text); }
+.correction-workspace { display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-width: 0; min-height: 0; background: var(--panel); }
+#stage { position: relative; overflow: hidden; background: var(--canvas); cursor: crosshair; }
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#world img, #world svg { position: absolute; left: 0; top: 0; user-select: none; -webkit-user-drag: none; }
+#overlay, #marks { pointer-events: none; }
+#marks { overflow: visible; }
+.empty { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--space-5); text-align: center; color: var(--canvas-text); }
+.tools { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3); border-bottom: 1px solid var(--rule); }
+.tools input[type=range] { width: min(7rem, 100%); margin: 0; }
+.tools-end { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-inline-start: auto; }
+#cstatus { padding: var(--space-2) var(--space-3); color: var(--ink2); font-size: var(--text-small); overflow-wrap: anywhere; }
+.help { padding: 0 var(--space-4) var(--space-4); color: var(--ink2); font-size: var(--text-small); }
+kbd { padding: 0 var(--space-1); font: var(--text-compact) var(--font-mono); background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; }
+
+.modal {
+  width: min(40rem, calc(100% - 2 * var(--gutter))); padding: var(--space-3);
+  border: 0; border-radius: var(--panel-radius); background: var(--panel); color: var(--ink); box-shadow: var(--shadow-dialog);
+}
+.modal::backdrop { background: rgba(16, 35, 26, .52); }
+.modal .box { max-height: 80vh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.modal .head { padding: var(--space-2) var(--space-3) var(--space-3); display: grid; gap: var(--space-1); }
+.modal .lst { overflow: auto; border-block: 1px solid var(--rule); }
+.modal .lst h3 { margin: 0; padding: var(--space-2) var(--space-3) var(--space-1); color: var(--muted); font-size: var(--text-small); }
+.modal .ent { display: block; width: 100%; padding: var(--space-2) var(--space-3); border: 0; border-radius: 0; text-align: start; overflow-wrap: anywhere; }
+.modal .ent .path { display: block; margin-block-start: var(--space-1); }
+.modal .ent:hover { background: var(--bg); }
+.modal .ent:focus-visible { outline-offset: -3px; }
+.modal .foot { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-2) var(--space-1); }
+
+@media (max-width: 980px) {
+  .split { grid-template-columns: 11rem minmax(0, 1fr) 12rem; }
+  .split.two { grid-template-columns: 11rem minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  header { gap: var(--space-2); padding-block-start: var(--space-3); }
+  header h1 { flex-basis: 100%; }
+  nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }
+  nav button { padding: 0 var(--space-1); min-height: 44px; }
+  #tab-check .split { grid-template: auto minmax(0, 1fr) / minmax(0, 1fr); }
+  #tab-correct .split { position: static; grid-template-columns: minmax(0, 1fr); min-height: 100%; }
+  #tab-correct .correction-workspace { grid-template-rows: auto auto minmax(300px, 44svh); }
+  #tab-check aside, #tab-correct aside { border-inline: 0; border-block-end: 1px solid var(--rule); }
+  #tab-correct aside.right { border-block-start: 1px solid var(--rule); }
+  #qclist, #photos, #plants { display: flex; overflow-x: auto; }
+  #qclist .it, #photos .it, #plants .it { flex: none; width: auto; max-width: 85%; }
+  .viewer { padding: var(--space-3); }
+}
+@media (max-width: 480px) {
+  .page { padding-block: var(--space-5) var(--space-6); gap: var(--space-4); }
+  .card { padding: 16px; }
+  nav button { gap: var(--space-1); font-size: var(--text-small); }
+  nav .n { width: 18px; height: 18px; }
+  #next { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding-block: var(--space-1) var(--space-2); }
+  #next span { grid-area: 2 / 1 / 3 / -1; }
+  #next .link { grid-area: 1 / 2; }
+  .chart-controls { grid-template-columns: minmax(0, 1fr); }
+  .summary-options { padding-inline-start: var(--space-2); }
+  .summary-picker .link { margin-block-end: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>CanopySplit <span class="brand-edition">Studio</span></h1>
+  <nav aria-label="Measurement workflow">
+    <button data-tab="run" class="on" aria-current="step"><span class="n">1</span>Measure</button>
+    <button data-tab="check" disabled><span class="n">2</span>Check</button>
+    <button data-tab="correct" disabled><span class="n">3</span>Correct</button>
+    <button data-tab="results" disabled><span class="n">4</span>Results</button>
+  </nav>
+</header>
+<div id="next" hidden></div>
+
+<main>
+  <!-- 1 MEASURE -->
+  <section class="tab" id="tab-run">
+    <div class="page">
+      <section class="card" aria-labelledby="dataset-title">
+        <h2 id="dataset-title">1. Select a dataset</h2>
+        <section class="dataset-guide" aria-labelledby="folder-structure-title">
+          <h3 id="folder-structure-title">Folder structure</h3>
+          <p>Put <strong>JPG, JPEG, or PNG</strong> photos directly in one folder.</p>
+          <pre class="dataset-example" aria-label="Example dataset folder"><code>photos/
+  day1_RGB_group1.jpg
+  day1_NIR_group1.jpg  (optional)
+  day2_RGB_group1.jpg</code></pre>
+        </section>
+        <section class="dataset-guide" aria-labelledby="filename-title">
+          <h3 id="filename-title">Filename format</h3>
+          <ul class="dataset-notes" id="dataset-naming">
+            <li><strong><code>day1</code></strong> is day 1 of the experiment, as shown in the results.</li>
+            <li><strong><code>group1</code></strong> identifies plants photographed together. Keep the same group ID across days.</li>
+            <li><strong>RGB</strong> is the required colour photo. Use one per group and day.</li>
+            <li><strong>NIR</strong> (near-infrared) is optional. Match the RGB photo’s day and group ID for relative NDVI.</li>
+          </ul>
+        </section>
+        <div class="field">
+          <label for="f-photos">Dataset folder</label>
+          <div class="pick">
+            <input id="f-photos" type="text" placeholder="Folder path" aria-describedby="dataset-naming f-info" spellcheck="false">
+            <button data-pick="f-photos" aria-label="Browse for dataset folder">Browse…</button>
+          </div>
+          <p id="f-info" class="small" aria-live="polite" hidden></p>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="measurement-title">
+        <h2 id="measurement-title">2. Run measurement</h2>
+        <section class="setup" id="setup" aria-label="Software setup issue" hidden>
+          <div class="setup-line">
+            <p class="setup-status" id="setup-status" role="status"></p>
+            <button class="link" id="setup-retry">Check again</button>
+          </div>
+          <ul class="setup-list" id="setup-list" hidden></ul>
+          <p id="setup-help" hidden></p>
+        </section>
+        <div class="field measure-diameter">
+          <label for="f-dia">Pot top diameter</label>
+          <div class="diameter-controls">
+            <input id="f-dia" type="number" inputmode="decimal" step="any" value="22.23" required aria-describedby="diameter-area-unit">
+            <select id="f-dia-unit" aria-label="Pot diameter unit">
+              <option value="cm">cm (Metric)</option>
+              <option value="in">in (US)</option>
+            </select>
+          </div>
+          <p class="small" id="diameter-area-unit">Physical area will be reported in cm².</p>
+        </div>
+        <section class="measurements" aria-labelledby="measurements-title">
+          <h3 id="measurements-title">Measurements and statistics</h3>
+          <ul class="dataset-notes">
+            <li><strong>Leaf area.</strong> Pixels, physical area, and fraction of pot area.</li>
+            <li><strong>Colour and greenness.</strong> Relative RGB, VARI, GLI, NGRDI, and ExG.</li>
+            <li><strong>Leaf damage.</strong> Damaged area and damage by colour from RGB photos.</li>
+            <li><strong>Near-infrared.</strong> Relative NIR and NDVI from usable RGB/NIR pairs.</li>
+          </ul>
+          <div class="summary-options">
+            <div class="summary-picker">
+              <div class="field">
+                <div class="measurement-label">
+                  <label for="summary-measurement">Statistics for</label>
+                  <button class="measurement-help" id="summary-measurement-help" type="button" data-measurement-help="summary-measurement"
+                          aria-label="Explain the selected measurement" aria-controls="summary-measurement-definition" aria-expanded="false" hidden>?</button>
+                </div>
+                <select id="summary-measurement" aria-describedby="summary-help">
+                  <option value="">Default for all measurements</option>
+                </select>
+              </div>
+              <button class="link" id="summary-use-defaults" hidden>Use defaults</button>
+            </div>
+            <p class="measurement-definition" id="summary-measurement-definition" aria-live="polite" hidden></p>
+            <p class="small" id="summary-help">Choose a measurement to customize its statistics. Other measurements use the defaults.</p>
+            <div class="summary-checks" role="group" aria-label="Summary statistics">
+              <label><input type="checkbox" name="summary-stat" value="mean" checked> Mean</label>
+              <label><input type="checkbox" name="summary-stat" value="median" checked> Median</label>
+              <label><input type="checkbox" name="summary-stat" value="min" checked> Minimum</label>
+              <label><input type="checkbox" name="summary-stat" value="max" checked> Maximum</label>
+              <label><input type="checkbox" id="include-percentiles" aria-controls="percentile-settings"> Percentiles</label>
+            </div>
+            <div class="field" id="percentile-settings" hidden>
+              <div class="percentile-fields" role="group" aria-label="Percentile values">
+                <input type="number" name="summary-percentile" aria-label="First percentile" aria-describedby="percentile-help" min="0" max="100" step="any" inputmode="decimal" placeholder="e.g. 10" disabled>
+                <input type="number" name="summary-percentile" aria-label="Second percentile" aria-describedby="percentile-help" min="0" max="100" step="any" inputmode="decimal" placeholder="e.g. 50" disabled>
+                <input type="number" name="summary-percentile" aria-label="Third percentile" aria-describedby="percentile-help" min="0" max="100" step="any" inputmode="decimal" placeholder="e.g. 90" disabled>
+              </div>
+              <p class="small" id="percentile-help">Percentile values can range from 0 to 100. Enter up to three.</p>
+            </div>
+          </div>
+        </section>
+        <div class="field">
+          <label for="results-location">Location to save results</label>
+          <div class="pick">
+            <input id="results-location" type="text" placeholder="Automatic" readonly>
+            <button data-pick="output" aria-label="Browse for a location to save results">Browse…</button>
+          </div>
+        </div>
+        <button class="primary big" id="runbtn" disabled>Checking setup…</button>
+        <pre class="log" id="runlog" hidden></pre>
+        <div class="done-msg" id="rundone" aria-live="polite" hidden></div>
+      </section>
+      <section class="card saved-results" aria-labelledby="saved-results-title">
+        <h2 id="saved-results-title">Open saved results</h2>
+        <p>Browse to a previous run to open it in <strong>Step 2 · Check</strong>.</p>
+        <div class="field">
+          <label for="saved-results-location">Saved results folder</label>
+          <div class="pick">
+            <input id="saved-results-location" type="text" placeholder="Folder path" readonly>
+            <button data-pick="saved" aria-label="Browse for saved results folder">Browse…</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- 2 CHECK -->
+  <section class="tab" id="tab-check" hidden>
+    <div class="split two">
+      <aside><h3>Photos</h3><div id="qclist"></div></aside>
+      <div class="viewer">
+        <div class="bar">
+          <b id="qcname"></b>
+          <div class="qc-navigation">
+            <button class="qc-arrow previous" id="qcprev" aria-label="Previous photo" disabled></button>
+            <button class="qc-arrow" id="qcnext" aria-label="Next photo" disabled></button>
+          </div>
+          <button class="primary" id="qccorrect">Correct this photo</button>
+        </div>
+        <div class="bar" id="qc-view" role="group" aria-label="Check image view" hidden>
+          <button id="qc-rgb" aria-pressed="true">RGB</button>
+          <button id="qc-nir" aria-pressed="false">Aligned NoIR</button>
+        </div>
+        <div id="qcimage" hidden></div>
+        <div class="legend" id="qc-nir-status" role="status" hidden></div>
+        <div class="legend" id="qc-rgb-key" hidden>Box = pot and its name · same colour = that plant's leaves · <span class="viewer-alert">red name</span> = needs a manual check</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 CORRECT -->
+  <section class="tab" id="tab-correct" hidden>
+    <div class="split">
+      <aside><h3>Photos to check</h3><div id="photos"></div></aside>
+      <div class="correction-workspace">
+        <div class="tools">
+          <button id="t-piece" class="on" title="Click a piece of leaf to give it to the selected plant (P)">Piece</button>
+          <button id="t-brush" title="Paint along a leaf (B)">Brush</button>
+          <button id="t-remove" title="Take leaf away from any plant (R)">Remove</button>
+          <input id="radius" type="range" min="3" max="60" value="14" aria-label="Brush size" title="Brush size">
+          <div class="tools-end">
+            <button id="undo" title="Ctrl+Z" disabled>Undo</button>
+            <button id="save" class="primary" title="Ctrl+S" disabled>Save photo</button>
+          </div>
+        </div>
+        <div id="cstatus" hidden></div>
+        <div id="stage">
+          <div class="empty" id="empty">Choose a photo to correct.</div>
+          <div id="world" hidden><svg id="marks"></svg></div>
+        </div>
+      </div>
+      <aside class="right">
+        <h3>Plants</h3>
+        <div id="plants"></div>
+        <h3>How</h3>
+        <div class="help">
+          1. Click the plant a leaf belongs to.<br>
+          2. <b>Piece</b>: click the wrong-coloured leaf.<br>
+          3. <b>Save photo</b>, also if it was already right.<br><br>
+          <b>Brush</b> / <b>Remove</b> for small fixes.
+          Wheel = zoom · right-drag = move · <kbd>F</kbd> = fit · <kbd>H</kbd> = hide colours · <kbd>Ctrl+Z</kbd> = undo.
+          <span class="flag">!</span> = flagged plant.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 4 RESULTS -->
+  <section class="tab" id="tab-results" hidden>
+    <div class="page">
+      <div class="card">
+        <h2 id="r-title">Results</h2>
+        <div class="stats" id="r-stats"></div>
+        <div id="r-recalc" hidden class="done-msg"></div>
+        <div><button class="primary" id="recalc">Recalculate with corrections</button></div>
+        <pre class="log" id="recalclog" hidden></pre>
+        <div class="small"><a href="/api/traits.csv" download="traits.csv">Download per-plant CSV</a> <span class="path" id="r-path"></span></div>
+      </div>
+      <section class="card summary-card" aria-labelledby="summary-title">
+        <h2 id="summary-title">Group statistics</h2>
+        <div class="summary-tools" id="summary-tools" hidden>
+          <div class="field" id="summary-select">
+            <div class="measurement-label">
+              <label for="summary-trait">Measurement</label>
+              <button class="measurement-help" id="summary-trait-help" type="button" data-measurement-help="summary-trait"
+                      aria-label="Explain the selected measurement" aria-controls="summary-trait-definition" aria-expanded="false" hidden>?</button>
+            </div>
+            <select id="summary-trait"></select>
+          </div>
+          <a class="small" href="/api/summary.csv" download="summary.csv">Download summary CSV</a>
+        </div>
+        <p class="measurement-definition" id="summary-trait-definition" aria-live="polite" hidden></p>
+        <p class="small" id="summary-status" role="status"></p>
+        <div class="summary-scroll" id="summary-scroll" tabindex="0" aria-label="Statistics by group and day" hidden>
+          <table>
+            <thead id="summary-head"></thead>
+            <tbody id="summary-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="chart-title">
+        <h2 id="chart-title">Chart</h2>
+        <div class="chart-controls" id="chart-controls" hidden>
+          <div class="field">
+            <div class="measurement-label">
+              <label for="chart-measurement">Measurement</label>
+              <button class="measurement-help" id="chart-measurement-help" type="button" data-measurement-help="chart-measurement"
+                      aria-label="Explain the selected measurement" aria-controls="chart-measurement-definition" aria-expanded="false" hidden>?</button>
+            </div>
+            <select id="chart-measurement"></select>
+          </div>
+          <div class="field" id="chart-statistic-field" hidden>
+            <div class="measurement-label"><label for="chart-statistic">Statistic</label></div>
+            <select id="chart-statistic"></select>
+          </div>
+        </div>
+        <p class="measurement-definition" id="chart-measurement-definition" aria-live="polite" hidden></p>
+        <p class="small" id="chart-status" role="status" hidden></p>
+        <div id="chart-view" hidden></div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<dialog class="modal" id="picker" aria-labelledby="pk-title">
+  <div class="box">
+    <div class="head"><h2 id="pk-title">Choose a folder</h2><span class="path" id="pk-path"></span><span class="small" id="pk-info" aria-live="polite"></span></div>
+    <div class="lst" id="pk-list"></div>
+    <div class="foot"><button id="pk-cancel">Cancel</button><button class="primary" id="pk-use" disabled>Use this folder</button></div>
+  </div>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[char]);
+let state = { open: null, recent: [], default_out: "" };
+
+function updateMeasurementHelp(select) {
+  const button = $(select.id + "-help");
+  const panel = $(button.getAttribute("aria-controls"));
+  const descriptions = state.measurement_help ?? {};
+  const label = select.selectedOptions[0]?.textContent;
+  const text = Object.hasOwn(descriptions, select.value) ? descriptions[select.value]
+    : select.id === "summary-measurement" && !select.value
+      ? "Defaults apply to measurements without custom settings. Select an individual measurement to see what it measures and choose its statistics."
+      : "";
+  button.hidden = !text;
+  button.setAttribute("aria-label", label ? `About ${label}` : "Explain the selected measurement");
+  panel.hidden = !text || button.getAttribute("aria-expanded") !== "true";
+  panel.textContent = text;
+}
+for (const button of document.querySelectorAll("[data-measurement-help]")) {
+  button.onclick = () => {
+    button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
+    updateMeasurementHelp($(button.dataset.measurementHelp));
+  };
+}
+
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  const j = await r.json();
+  if (j && j.error) { alert(j.error); throw new Error(j.error); }
+  return j;
+}
+const join = (a, b) => a + (/[\\/]$/.test(a) ? "" : (a.includes("\\") ? "\\" : "/")) + b;
+const lastName = p => p.split(/[\\/]/).filter(Boolean).pop();
+
+// ================= tabs, state and "next step" bar =================
+let curTab = "run";
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+function showTab(t) {
+  if (t !== "run" && !state.open) return;
+  if (t === "correct" && !state.open.photos_available) return;
+  curTab = t;
+  document.querySelectorAll("nav button").forEach(b => {
+    const current = b.dataset.tab === t;
+    b.classList.toggle("on", current);
+    b.setAttribute("aria-current", current ? "step" : "false");
+  });
+  for (const k of ["run", "check", "correct", "results"]) $("tab-" + k).hidden = k !== t;
+  if (t === "check") loadQC();
+  if (t === "correct") { loadPhotos(); setTimeout(fit, 0); }
+  if (t === "results") loadResults();
+}
+async function refreshState() {
+  state = await api("/api/state");
+  updateSummaryMeasurements();
+  updateOutputFolder();
+  $("saved-results-location").value = state.open?.results || "";
+  document.querySelectorAll("nav button").forEach(b => {
+    if (b.dataset.tab !== "run") b.disabled = !state.open || (b.dataset.tab === "correct" && !state.open.photos_available);
+  });
+  renderNext();
+}
+function renderNext() {
+  const o = state.open, bar = $("next");
+  if (!o) { bar.hidden = true; return; }
+  bar.hidden = false; bar.className = "";
+  const runName = `<strong class="run-name">${escapeHtml(lastName(o.results))}</strong>`;
+  if (!o.photos_available) { bar.className = "warn"; bar.innerHTML = `${runName}<span>The original photos are needed for corrections.</span><button class="link" onclick="showTab('results')">See results →</button>`; }
+  else if (o.to_check) { bar.className = "warn"; bar.innerHTML = `${runName}<span>${o.to_check} ${o.to_check === 1 ? "photo needs" : "photos need"} a manual check (plants overlap).</span><button class="link" onclick="showTab('correct')">Correct them →</button>`; }
+  else if (o.needs_recalc) { bar.className = "warn"; bar.innerHTML = `${runName}<span>Corrections saved.</span><button class="link" onclick="showTab('results')">Recalculate the results →</button>`; }
+  else { bar.innerHTML = `${runName}<span>Done. ${o.corrected ? o.corrected + " photos corrected by hand." : ""}</span><button class="link" onclick="showTab('results')">See results →</button>`; }
+}
+async function openResults(path) {
+  if (correctionBusy) return;
+  if (info && info.dirty && !confirm("Leave this photo without saving its edits?")) return;
+  try { await api("/api/open", { results: path }); } catch { return; }
+  $("picker").close();
+  clearCorrection(); qcCur = 0; qcMode = "rgb";
+  await refreshState();
+  showTab("check");
+}
+
+// ================= folder picker =================
+let pk = { target: null, path: "", request: 0 };
+async function browseFolder(path) {
+  const response = await fetch("/api/browse?path=" + encodeURIComponent(path));
+  if (!response.ok) throw new Error("Could not open folder");
+  return response.json();
+}
+const chooseResults = () => pk.target === "saved";
+let outputPath = "", folderPickerPending = false;
+function updateOutputFolder() {
+  const suggested = state.default_out && datasetPath ? join(state.default_out, lastName(datasetPath)) : "";
+  $("results-location").value = outputPath || suggested;
+}
+document.querySelectorAll("[data-pick]").forEach(button => {
+  button.onclick = () => pickLocalFolder(button);
+});
+async function pickLocalFolder(button) {
+  if (folderPickerPending) return;
+  const target = button.dataset.pick;
+  const start = {
+    "f-photos": $("f-photos").value.trim(),
+    output: outputPath || state.default_out,
+    saved: $("saved-results-location").value || state.default_out,
+  }[target];
+  folderPickerPending = button.disabled = true;
+  button.textContent = "Choosing…";
+  updateRunButton();
+  let result;
+  try {
+    const response = await fetch("/api/pick-folder", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ start, purpose: target === "f-photos" ? "dataset" : target })
+    });
+    if (response.ok) result = await response.json();
+  } catch {
+    // The in-app picker also works when a desktop dialog is unavailable.
+  } finally {
+    button.textContent = "Browse…";
+    folderPickerPending = button.disabled = false;
+    updateRunButton();
+  }
+  if (result?.busy) return;
+  if (!result?.available) return openPicker(target);
+  if (result.path) await useFolder(target, result.path);
+  if (document.activeElement === document.body) button.focus();
+}
+function useFolder(target, path) {
+  if (target === "saved") return openResults(path);
+  if (target === "output") {
+    outputPath = path;
+    updateOutputFolder();
+  } else {
+    $("f-photos").value = path;
+    photosChanged();
+  }
+}
+function openPicker(target) {
+  pk = { target, path: "", request: 0 };
+  const saving = target === "output";
+  $("pk-title").textContent = chooseResults() ? "Choose saved results" : saving ? "Choose the results folder" : "Choose the dataset folder";
+  $("pk-use").textContent = chooseResults() ? "Open results" : saving ? "Save here" : "Use this folder";
+  $("picker").showModal();
+  pkGo(chooseResults() ? "" : saving ? outputPath : $("f-photos").value.trim());
+}
+async function pkGo(path) {
+  const picker = pk, request = ++picker.request;
+  const box = $("pk-list"), status = $("pk-info"), use = $("pk-use");
+  use.disabled = true;
+  box.replaceChildren();
+  $("pk-path").textContent = "";
+  status.textContent = "Opening folder…";
+  let data;
+  try {
+    data = await browseFolder(path);
+  } catch {
+    if (pk === picker && request === picker.request && $("picker").open) {
+      status.textContent = "That folder could not be opened.";
+      pickerEntry(box, "Browse folders", () => pkGo(""));
+    }
+    return;
+  }
+  if (pk !== picker || request !== picker.request || !$("picker").open) return;
+  picker.path = data.path;
+  $("pk-path").textContent = data.path;
+  status.textContent = data.top || pk.target === "output" ? "" : chooseResults()
+    ? (data.is_results ? "Saved results found" : "Open the folder for the run you want to review.")
+    : (data.n_images ? `${data.n_images} photo${data.n_images === 1 ? "" : "s"} in this folder` : "No supported photos in this folder.");
+  use.hidden = data.top;
+  use.disabled = data.top || (chooseResults() ? !data.is_results : pk.target === "f-photos" && !data.n_images);
+  if (data.top && chooseResults()) {
+    if (state.recent.length) {
+      pickerHeading(box, "Recent results");
+      for (const result of state.recent) pickerEntry(box, lastName(result), () => openResults(result), result);
+    }
+    pickerHeading(box, "Browse folders");
+  }
+  if (!data.top) pickerEntry(box, "Parent folder", () => pkGo(data.parent || ""));
+  for (const name of data.dirs) pickerEntry(box, name, () => pkGo(data.top ? name : join(data.path, name)));
+}
+function pickerHeading(box, label) {
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+  box.appendChild(heading);
+}
+function pickerEntry(box, label, action, path) {
+  const button = document.createElement("button");
+  button.className = "ent";
+  button.textContent = label;
+  button.onclick = action;
+  if (path) {
+    const detail = document.createElement("span");
+    detail.className = "path";
+    detail.textContent = path;
+    button.appendChild(detail);
+  }
+  box.appendChild(button);
+}
+$("pk-cancel").onclick = () => $("picker").close();
+$("pk-use").onclick = () => {
+  if (chooseResults()) return openResults(pk.path);
+  $("picker").close();
+  useFolder(pk.target, pk.path);
+};
+const photoCount = (count, channel) => `${count} ${channel} photo${count === 1 ? "" : "s"}`;
+function datasetProblem(folder) {
+  if (!folder.n_rgb) return "No RGB photos found. Use names like day1_RGB_group1.jpg.";
+  return folder.photo_problems.join(" ");
+}
+let datasetPath = "", datasetRequest = 0, datasetTimer;
+function photosChanged() {
+  const path = $("f-photos").value.trim(), request = ++datasetRequest;
+  const status = $("f-info");
+  clearTimeout(datasetTimer);
+  datasetPath = "";
+  updateRunButton();
+  updateOutputFolder();
+  status.hidden = !path;
+  status.removeAttribute("data-error");
+  if (!path) return;
+  status.textContent = "Checking the dataset folder…";
+  datasetTimer = setTimeout(async () => {
+    try {
+      const data = await browseFolder(path);
+      if (request !== datasetRequest) return;
+      const problem = data.n_images ? datasetProblem(data) : "No JPG, JPEG, or PNG photos found in this folder.";
+      if (problem) {
+        status.setAttribute("data-error", "");
+        status.textContent = problem;
+        return;
+      }
+      const count = photoCount(data.n_rgb, "RGB") + (data.n_nir ? ` · ${photoCount(data.n_nir, "NIR")}` : "");
+      const skipped = data.n_images - data.n_rgb - data.n_nir;
+      status.textContent = count + (skipped ? `. ${skipped} photo${skipped === 1 ? "" : "s"} will be skipped. Rename ${skipped === 1 ? "it" : "them"} to match the example, then select the folder again.` : "");
+      datasetPath = data.path;
+      updateOutputFolder();
+      updateRunButton();
+    } catch {
+      if (request !== datasetRequest) return;
+      status.setAttribute("data-error", "");
+      status.textContent = "That folder could not be opened. Choose a folder using Browse.";
+    }
+  }, 200);
+}
+$("f-photos").oninput = photosChanged;
+
+// ================= 1 MEASURE =================
+let setupReady = false, setupChecking = true, jobRunning = false;
+function updateRunButton() {
+  const run = $("runbtn");
+  run.disabled = !setupReady || !datasetPath || jobRunning || folderPickerPending;
+  run.textContent = setupChecking ? "Checking setup…" : "Run";
+}
+async function checkSetup(refresh = false) {
+  const section = $("setup"), status = $("setup-status"), help = $("setup-help");
+  const list = $("setup-list"), retry = $("setup-retry");
+  const retryFocused = document.activeElement === retry;
+  setupReady = false;
+  setupChecking = true;
+  updateRunButton();
+  retry.disabled = true;
+  status.textContent = "Checking local setup…";
+  help.hidden = list.hidden = true;
+  try {
+    const response = await fetch("/api/setup" + (refresh ? "?refresh=1" : ""));
+    if (!response.ok) throw new Error("Local setup check failed");
+    const result = await response.json();
+    setupReady = result.ready;
+    section.hidden = setupReady;
+    if (setupReady) {
+      if (retryFocused && document.activeElement === document.body) $("f-photos").focus();
+      return;
+    }
+    const failed = result.checks.filter(check => !check.ok);
+    const items = failed.map(check => {
+      const item = document.createElement("li"), name = document.createElement("b"), text = document.createElement("span");
+      name.textContent = check.name;
+      text.textContent = " — " + check.detail;
+      item.append(name, text);
+      return item;
+    });
+    list.replaceChildren(...items);
+    list.hidden = false;
+    status.textContent = "Setup needs attention";
+    if (failed.some(check => check.name === "Required libraries")) {
+      help.textContent = result.platform === "darwin"
+        ? "Close the app and reopen start_mac.command to install the required versions."
+        : "Install the required versions from requirements.txt, then reopen CanopySplit Studio.";
+      help.hidden = false;
+    }
+  } catch {
+    status.textContent = "Could not check local setup";
+    help.textContent = "Check again. If it still fails, close and reopen CanopySplit Studio.";
+    section.hidden = help.hidden = false;
+  } finally {
+    retry.disabled = false;
+    setupChecking = false;
+    updateRunButton();
+  }
+}
+$("setup-retry").onclick = () => checkSetup(true);
+const diameterField = $("f-dia"), diameterUnit = $("f-dia-unit");
+const centimeters = {cm: 1, in: 2.54};
+let diameterCm = diameterField.valueAsNumber;
+diameterField.oninput = () => {
+  diameterCm = diameterField.valueAsNumber * centimeters[diameterUnit.value];
+  diameterField.setCustomValidity("");
+};
+diameterUnit.onchange = () => {
+  $("diameter-area-unit").textContent = `Physical area will be reported in ${diameterUnit.value}².`;
+  updateSummaryMeasurements();
+  if (!Number.isFinite(diameterCm)) return;
+  const converted = diameterCm / centimeters[diameterUnit.value];
+  diameterField.value = Number(converted.toPrecision(10));
+};
+const summaryMeasurement = $("summary-measurement"), useSummaryDefaults = $("summary-use-defaults");
+const summaryChecks = [...document.querySelectorAll('[name="summary-stat"]')];
+const percentileCheckbox = $("include-percentiles");
+const percentileFields = [...document.querySelectorAll('[name="summary-percentile"]')];
+const summaryDrafts = new Map();
+function updateSummaryMeasurements() {
+  const selected = summaryMeasurement.value;
+  const traits = (state.summary_traits ?? []).filter(([key]) => !key.endsWith("_in2"));
+  summaryMeasurement.replaceChildren(new Option("Default for all measurements", ""), ...traits.map(([key, label]) =>
+    new Option(label.replace("cm²", `${diameterUnit.value}²`).replace("RGB-classified ", "RGB "), key)));
+  summaryMeasurement.value = traits.some(([key]) => key === selected) ? selected : "";
+  showSummaryDraft();
+}
+function updatePercentileFields() {
+  const enabled = percentileCheckbox.checked;
+  $("percentile-settings").hidden = !enabled;
+  for (const field of percentileFields) {
+    field.disabled = !enabled;
+    field.setCustomValidity("");
+  }
+}
+function saveSummaryDraft() {
+  const key = summaryMeasurement.value;
+  summaryDrafts.set(key, {
+    summary_stats: summaryChecks.filter(field => field.checked).map(field => field.value),
+    usePercentiles: percentileCheckbox.checked,
+    entries: percentileFields.map(field => field.validity.badInput ? null : field.value)
+  });
+  useSummaryDefaults.hidden = !key;
+}
+function showSummaryDraft() {
+  const key = summaryMeasurement.value;
+  const draft = summaryDrafts.get(key) ?? summaryDrafts.get("");
+  for (const field of summaryChecks) field.checked = draft.summary_stats.includes(field.value);
+  percentileCheckbox.checked = draft.usePercentiles;
+  percentileFields.forEach((field, i) => { field.value = draft.entries[i] ?? ""; });
+  useSummaryDefaults.hidden = !key || !summaryDrafts.has(key);
+  updatePercentileFields();
+  updateMeasurementHelp(summaryMeasurement);
+}
+summaryMeasurement.onchange = showSummaryDraft;
+useSummaryDefaults.onclick = () => {
+  summaryDrafts.delete(summaryMeasurement.value);
+  showSummaryDraft();
+  summaryMeasurement.focus();
+};
+for (const field of summaryChecks) field.onchange = saveSummaryDraft;
+percentileCheckbox.onchange = () => {
+  updatePercentileFields();
+  saveSummaryDraft();
+};
+for (const field of percentileFields) {
+  field.oninput = () => {
+    field.setCustomValidity("");
+    saveSummaryDraft();
+  };
+}
+saveSummaryDraft();
+updatePercentileFields();
+updateMeasurementHelp(summaryMeasurement);
+
+function summaryRequest() {
+  const choices = {};
+  for (const [key, draft] of summaryDrafts) {
+    const percentiles = [];
+    if (draft.usePercentiles) {
+      const invalid = (i, message) => {
+        summaryMeasurement.value = key;
+        showSummaryDraft();
+        percentileFields[i].setCustomValidity(message);
+        percentileFields[i].reportValidity();
+        return null;
+      };
+      for (const [i, entry] of draft.entries.entries()) {
+        if (entry === "") continue;
+        const value = Number(entry);
+        if (entry === null || !Number.isFinite(value) || value < 0 || value > 100) {
+          return invalid(i, "Enter a percentile from 0 to 100.");
+        }
+        if (percentiles.includes(value)) return invalid(i, "Enter a different percentile.");
+        percentiles.push(value);
+      }
+      if (!percentiles.length) return invalid(0, "Enter a percentile or clear the Percentiles checkbox.");
+    }
+    choices[key] = { summary_stats: draft.summary_stats, percentiles };
+  }
+  const { "": defaults, ...summary_overrides } = choices;
+  return { ...defaults, summary_overrides };
+}
+$("runbtn").onclick = async () => {
+  if (!datasetPath || correctionBusy) return;
+  const validDiameter = Number.isFinite(diameterCm) && diameterCm > 0;
+  diameterField.setCustomValidity(diameterField.value && !validDiameter ? "Enter a positive pot diameter." : "");
+  if (!diameterField.reportValidity()) return;
+  const summaries = summaryRequest();
+  if (!summaries) return;
+  if (info && info.dirty && !confirm("Leave this photo without saving its edits?")) return;
+  $("rundone").hidden = true;
+  jobRunning = true;
+  updateRunButton();
+  try {
+    const request = {
+      photos: datasetPath, out_dir: outputPath, pot_diameter_cm: diameterCm,
+      area_unit: diameterUnit.value, ...summaries
+    };
+    await api("/api/run", request);
+    pollJob("runlog");
+  } catch {
+    jobRunning = false;
+    checkSetup();
+  }
+};
+async function pollJob(logId) {
+  const j = await api("/api/job");
+  const log = $(logId); log.hidden = false;
+  log.textContent = j.log || "Starting…"; log.scrollTop = log.scrollHeight;
+  jobRunning = j.running;
+  updateRunButton();
+  $("recalc").disabled = j.running || !state.open?.photos_available;
+  if (j.running) return setTimeout(() => pollJob(logId), 1500);
+  if (!j.ok) { log.textContent += "\n\nStopped with an error (see above)."; return; }
+  await refreshState();
+  clearCorrection();
+  if (j.kind === "run") {
+    qcCur = 0; qcMode = "rgb";
+    log.hidden = true;
+    const o = state.open, m = $("rundone"); m.hidden = false;
+    if (curTab !== "run") showTab("check");
+    m.innerHTML = o.to_check
+      ? `Finished. ${o.to_check} ${o.to_check === 1 ? "photo needs" : "photos need"} a manual check. <button class="primary" onclick="showTab('check')">Review in Check</button>`
+      : `Finished. No photos need a manual check. <button class="primary" onclick="showTab('check')">Review in Check</button>`;
+    if (o.skipped_photos) m.prepend(`${o.skipped_photos} RGB ${o.skipped_photos === 1 ? "photo had" : "photos had"} no measurable pots and ${o.skipped_photos === 1 ? "was" : "were"} skipped. `);
+  } else {
+    log.hidden = true;
+    if (curTab === "check") loadQC();
+    if (curTab === "results") loadResults();
+  }
+}
+
+// ================= 2 CHECK =================
+let qc = [], qcCur = 0, qcMode = "rgb", qcRequest = 0;
+const qcNirStatus = {
+  missing: "No paired NoIR photo for this image.",
+  failed: "NoIR alignment failed. Relative NIR and NDVI are unavailable for this photo.",
+  aligned: "The NoIR preview is missing. Recalculate in Results to regenerate it.",
+  legacy: "Recalculate in Results to check NoIR alignment for this saved run."
+};
+async function loadQC() {
+  const results = state.open?.results, request = ++qcRequest, box = $("qclist");
+  qc = [];
+  box.replaceChildren();
+  $("qcimage").replaceChildren();
+  $("qcimage").hidden = $("qc-view").hidden = $("qc-nir-status").hidden = $("qc-rgb-key").hidden = $("qccorrect").hidden = true;
+  $("qcprev").disabled = $("qcnext").disabled = true;
+  $("qcname").textContent = "Loading review images…";
+  let review;
+  try { review = await api("/api/qc_list"); }
+  catch {
+    if (request === qcRequest) $("qcname").textContent = "Could not load the review images.";
+    return;
+  }
+  if (results !== state.open?.results || request !== qcRequest) return;
+  qc = review;
+  qc.forEach((q, i) => {
+    const d = document.createElement("button"); d.type = "button"; d.className = "it";
+    const chip = q.done ? `<span class="chip done">corrected</span>` : q.flagged ? `<span class="chip todo">check</span>` : "";
+    d.innerHTML = `<span>${escapeHtml(q.label)}</span>${chip}`;
+    d.onclick = () => showQC(i); box.appendChild(d);
+  });
+  $("qcprev").disabled = $("qcnext").disabled = qc.length < 2;
+  if (qc.length) showQC(Math.min(qcCur, qc.length - 1));
+  else $("qcname").textContent = "No review images yet.";
+}
+function showQC(i) {
+  qcCur = i; const q = qc[i];
+  const showNir = qcMode === "nir" && Boolean(q.nir_name);
+  $("qc-view").hidden = !q.nir_name;
+  $("qc-rgb").setAttribute("aria-pressed", String(!showNir));
+  $("qc-nir").setAttribute("aria-pressed", String(showNir));
+  const status = $("qc-nir-status");
+  status.textContent = showNir
+    ? "Coloured outlines show the RGB leaf assignments." +
+      (q.nir_filtered ? " Orange shading shows pixels excluded by the NoIR filter." : "")
+    : q.nir_name ? "" : (qcNirStatus[q.nir_alignment] || "");
+  status.hidden = !status.textContent;
+  $("qc-rgb-key").hidden = showNir;
+  const image = new Image();
+  image.alt = showNir ? "Aligned NoIR photo with RGB leaf outlines and pot IDs" : "RGB photo with labelled pots and leaf masks";
+  image.src = "/api/qc.jpg?name=" + encodeURIComponent(showNir ? q.nir_name : q.name) + "&t=" + Date.now();
+  $("qcimage").replaceChildren(image);
+  $("qcimage").hidden = false;
+  $("qcname").textContent = `${q.label}  (${i + 1} of ${qc.length})`;
+  $("qccorrect").hidden = !state.open?.photos_available || !(q.flagged || q.done);
+  [...$("qclist").children].forEach((c, k) => {
+    c.classList.toggle("cur", k === i);
+    c.setAttribute("aria-current", String(k === i));
+  });
+}
+$("qc-rgb").onclick = () => { qcMode = "rgb"; showQC(qcCur); };
+$("qc-nir").onclick = () => { qcMode = "nir"; showQC(qcCur); };
+$("qcprev").onclick = () => qc.length && showQC((qcCur - 1 + qc.length) % qc.length);
+$("qcnext").onclick = () => qc.length && showQC((qcCur + 1) % qc.length);
+$("qccorrect").onclick = async () => { const q = qc[qcCur]; showTab("correct"); await openPhoto(q.image); };
+
+// ================= 4 RESULTS =================
+async function loadResults() {
+  const o = state.open; if (!o) return;
+  $("r-title").textContent = lastName(o.results);
+  const stat = (k, v) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  $("r-stats").innerHTML = stat("Photos", o.n_photos) + stat("Plant measurements", o.plant_rows.toLocaleString()) +
+    stat("Still to check", o.to_check) + stat("Corrected by hand", o.corrected);
+  if (o.skipped_photos) $("r-stats").insertAdjacentHTML("beforeend", stat("Photos without measurable pots", o.skipped_photos));
+  $("r-path").textContent = o.files.traits;
+  $("recalc").disabled = jobRunning || !o.photos_available;
+  $("r-recalc").hidden = o.photos_available && !o.needs_recalc;
+  $("r-recalc").textContent = o.photos_available
+    ? `${o.needs_recalc} corrected photo${o.needs_recalc > 1 ? "s are" : " is"} not in the results yet. Click Recalculate.`
+    : "The original photo folder is needed to recalculate this run.";
+  $("chart-controls").hidden = $("chart-view").hidden = true;
+  $("chart-measurement-definition").hidden = $("summary-trait-definition").hidden = true;
+  $("chart-view").replaceChildren();
+  $("chart-status").hidden = false;
+  $("chart-status").textContent = "Loading charts…";
+  const [summary, charts] = await Promise.all([api("/api/summary"), api("/api/charts")]);
+  if (state.open !== o) return;
+  loadSummary(summary);
+  loadChart(charts, summary);
+}
+function loadChart(savedCharts, summary) {
+  const measurement = $("chart-measurement"), previous = measurement.value;
+  const statistic = $("chart-statistic");
+  let preferredStatistic = statistic.value;
+  const view = $("chart-view"), status = $("chart-status");
+  const choices = new Map(), labels = new Map(summary.traits);
+  for (const [key, label] of summary.traits) {
+    const statistics = summary.statistics.filter(([stat]) => stat !== "n" && summary.rows.some(row => {
+      const value = row[`${key}_${stat}`];
+      return value?.trim() && Number.isFinite(Number(value));
+    }));
+    if (statistics.length) choices.set(key, { label, statistics });
+  }
+  for (const file of savedCharts) {
+    const key = file.slice(8, -4);
+    if (!choices.has(key) && !labels.has(key)) {
+      choices.set(key, { label: key.replaceAll("_", " "), statistics: [], file });
+    }
+  }
+  view.replaceChildren();
+  $("chart-controls").hidden = !choices.size;
+  if (!choices.size) {
+    measurement.replaceChildren();
+    statistic.replaceChildren();
+    status.textContent = "No charts are available for this run.";
+    return;
+  }
+  measurement.replaceChildren(...[...choices].map(([key, choice]) =>
+    new Option(choice.label.replace("RGB-classified ", "RGB "), key)));
+  if (choices.has(previous)) measurement.value = previous;
+
+  const render = () => {
+    const { label, file } = choices.get(measurement.value);
+    const params = new URLSearchParams(file ? { name: file } : {
+      measurement: measurement.value, statistic: statistic.value
+    });
+    const selected = statistic.selectedOptions[0]?.textContent;
+    view.hidden = true;
+    status.hidden = false;
+    status.textContent = "Loading chart…";
+    const image = new Image();
+    image.alt = `${label}${selected ? `, ${selected},` : ""} by experiment day and group`;
+    image.onload = () => {
+      if (!image.isConnected) return;
+      status.hidden = true;
+      view.hidden = false;
+    };
+    image.onerror = () => {
+      if (image.isConnected) status.textContent = "Could not load this chart.";
+    };
+    view.replaceChildren(image);
+    params.set("t", Date.now());
+    image.src = "/api/chart.png?" + params;
+  };
+  measurement.onchange = () => {
+    updateMeasurementHelp(measurement);
+    const { statistics } = choices.get(measurement.value);
+    const keys = statistics.map(([key]) => key);
+    statistic.replaceChildren(...statistics.map(([key, label]) =>
+      new Option(key.startsWith("q") ? `Percentile ${label.slice(1)}` : ({ min: "Minimum", max: "Maximum" }[key] || label), key)));
+    $("chart-statistic-field").hidden = !keys.length;
+    if (keys.length) {
+      statistic.value = [preferredStatistic, "median", "mean", "min", "max"].find(key => keys.includes(key))
+        || keys[Math.floor(keys.length / 2)];
+    }
+    render();
+  };
+  statistic.onchange = () => {
+    preferredStatistic = statistic.value;
+    render();
+  };
+  measurement.onchange();
+}
+function loadSummary(summary) {
+  const select = $("summary-trait"), previous = select.value;
+  const available = Boolean(summary.rows.length && summary.traits.length);
+  $("summary-tools").hidden = !summary.has_csv;
+  $("summary-select").hidden = !available;
+  $("summary-scroll").hidden = !available;
+  if (!available) $("summary-trait-definition").hidden = true;
+  $("summary-status").textContent = !available
+    ? "No group statistics are available for this run."
+    : summary.latest
+      ? "Counts show plants with a valid value." + (summary.statistics.some(([key]) => key.startsWith("q")) ? " P marks a percentile." : "")
+      : "Recalculate with corrections to add the full set of statistics to this saved run.";
+  if (!available) return;
+
+  select.replaceChildren(...summary.traits.map(([key, label]) => new Option(label, key)));
+  if (summary.traits.some(([key]) => key === previous)) select.value = previous;
+  const render = () => {
+    updateMeasurementHelp(select);
+    const key = select.value;
+    const columns = [["treatment", "Group"], ["day", "Day"]];
+    if (summary.rows.some(row => row.stage)) columns.push(["stage", "Stage"]);
+    for (const [stat, label] of summary.statistics) {
+      const column = key + "_" + stat;
+      if (Object.hasOwn(summary.rows[0], column)) columns.push([column, label]);
+    }
+    $("summary-head").innerHTML = "<tr>" + columns.map(([, label]) => `<th scope="col">${escapeHtml(label)}</th>`).join("") + "</tr>";
+    $("summary-body").innerHTML = summary.rows.map(row => "<tr>" +
+      columns.map(([column]) => `<td>${escapeHtml(row[column] || "—")}</td>`).join("") + "</tr>").join("");
+  };
+  select.onchange = render;
+  render();
+}
+$("recalc").onclick = async () => {
+  if (correctionBusy || jobRunning) return;
+  if (info && info.dirty && !confirm("The photo open in Correct has unsaved changes that will not be included. Continue?")) return;
+  await api("/api/recalculate", {}); pollJob("recalclog");
+};
+
+// ================= 3 CORRECT =================
+const photoImage = new Image(), overlayImage = new Image();
+photoImage.id = "photo";
+photoImage.alt = "Photo of the plants";
+overlayImage.id = "overlay";
+overlayImage.alt = "";
+photoImage.draggable = overlayImage.draggable = false;
+$("world").prepend(photoImage, overlayImage);
+
+let photos = [], cur = null, info = null, sel = 0, tool = "piece", ver = 0, loadRequest = 0;
+let view = { s: 1, x: 0, y: 0 }, panning = null, spaceDown = false, stroke = null;
+let correctionBusy = false;
+function correctionControls() {
+  $("save").disabled = correctionBusy || !info;
+  $("undo").disabled = correctionBusy || !info?.can_undo;
+}
+function clearCorrection() {
+  ++loadRequest;
+  cur = info = stroke = panning = null;
+  $("world").hidden = true;
+  $("empty").hidden = false;
+  $("empty").textContent = "Choose a photo to correct.";
+  $("cstatus").hidden = true;
+  correctionControls();
+  $("plants").replaceChildren();
+}
+async function loadPhotos() {
+  const results = state.open?.results, list = await api("/api/photos");
+  if (results !== state.open?.results) return;
+  photos = list;
+  renderPhotos();
+}
+function renderPhotos() {
+  const box = $("photos");
+  const focused = box.contains(document.activeElement) ? document.activeElement.dataset.image : null;
+  box.replaceChildren();
+  for (const p of photos) {
+    if (!p.flagged && !p.done) continue;
+    const d = document.createElement("button"); d.type = "button"; d.className = "it" + (p.image === cur ? " cur" : "");
+    d.dataset.image = p.image;
+    d.setAttribute("aria-current", String(p.image === cur));
+    const chip = p.done ? `<span class="chip done">corrected</span>` : `<span class="chip todo">${p.flagged} ${p.flagged === 1 ? "plant" : "plants"}</span>`;
+    d.innerHTML = `<span>${escapeHtml(p.tray)} · day ${p.day}</span>${chip}`;
+    d.onclick = () => openPhoto(p.image); box.appendChild(d);
+    if (p.image === focused) d.focus({ preventScroll: true });
+  }
+  if (!info) $("empty").textContent = box.children.length
+    ? "Choose a photo to correct." : "No photos need a manual check.";
+}
+async function openPhoto(image) {
+  if (correctionBusy || jobRunning) return;
+  const discard = info?.dirty && image !== cur ? cur : null;
+  if (discard && !confirm("This photo has unsaved changes. Leave without saving?")) return;
+  const request = ++loadRequest;
+  correctionBusy = true;
+  correctionControls();
+  $("cstatus").hidden = false;
+  $("cstatus").textContent = "Loading…";
+  let loaded;
+  try {
+    loaded = await api("/api/load?image=" + encodeURIComponent(image));
+    if (discard && request === loadRequest) await api("/api/discard", { image: discard });
+  }
+  catch {
+    if (request === loadRequest) {
+      if (info) renderStatus();
+      else $("cstatus").textContent = "Could not open this photo.";
+    }
+    return;
+  } finally {
+    correctionBusy = false;
+    correctionControls();
+  }
+  if (request !== loadRequest) return;
+  cur = image; info = loaded;
+  sel = Math.max(0, info.pots.findIndex(p => p.flagged));
+  $("photo").onload = fit;
+  $("photo").src = "/api/photo.jpg?image=" + encodeURIComponent(image);
+  $("empty").hidden = true; $("world").hidden = false;
+  refresh(); renderPhotos();
+}
+function refresh() {
+  $("overlay").src = "/api/overlay.png?image=" + encodeURIComponent(cur) + "&v=" + (++ver);
+  renderPlants(); renderMarks(); renderStatus();
+}
+function renderStatus() {
+  if (!info) return;
+  const st = info.dirty ? "not saved yet" : info.done ? "saved" : "automatic result";
+  $("cstatus").innerHTML = `<b>${escapeHtml(cur.replace(/\.(jpg|jpeg|png)$/i, "").replace(/_RGB_/i, " · "))}</b> · ${st} · selected: <b>${info.pots[sel] ? escapeHtml(info.pots[sel].pot_id) : "-"}</b>`;
+  correctionControls();
+}
+function renderPlants() {
+  const box = $("plants"); box.replaceChildren();
+  info.pots.forEach((p, i) => {
+    const d = document.createElement("button"); d.type = "button"; d.className = "it" + (i === sel ? " cur" : "");
+    d.setAttribute("aria-pressed", String(i === sel));
+    d.innerHTML = `<span class="plant"><span class="sw" style="background:${p.color}"></span>${escapeHtml(p.pot_id)}${p.flagged ? ' <span class="flag">!</span>' : ""}</span><span class="area">${p.area.toLocaleString()}</span>`;
+    d.onclick = () => {
+      const focused = document.activeElement === d;
+      sel = i; renderPlants(); renderMarks(); renderStatus();
+      if (focused) box.children[i].focus({ preventScroll: true });
+    };
+    box.appendChild(d);
+  });
+}
+function renderMarks() {
+  const svg = $("marks");
+  svg.setAttribute("viewBox", `0 0 ${info.w} ${info.h}`);
+  svg.setAttribute("width", info.w * info.display); svg.setAttribute("height", info.h * info.display);
+  svg.replaceChildren();
+  const fs = Math.max(36, info.w / 70);
+  info.pots.forEach((p, i) => {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", p.cx); t.setAttribute("y", p.cy); t.setAttribute("font-size", fs);
+    t.setAttribute("text-anchor", "middle"); t.setAttribute("font-weight", i === sel ? 800 : 600);
+    t.setAttribute("fill", "#fff"); t.setAttribute("stroke", i === sel ? p.color : "#000");
+    t.setAttribute("stroke-width", fs / 7); t.setAttribute("paint-order", "stroke");
+    t.textContent = p.pot_id + (p.flagged ? " !" : "");
+    svg.appendChild(t);
+  });
+  const c = document.createElementNS(NS, "circle");
+  c.id = "cursor"; c.setAttribute("fill", "none"); c.setAttribute("stroke", "#fff"); c.setAttribute("stroke-width", 3);
+  c.setAttribute("r", radius()); c.setAttribute("visibility", "hidden"); svg.appendChild(c);
+  const pl = document.createElementNS(NS, "polyline");
+  pl.id = "strokeline"; pl.setAttribute("fill", "none"); pl.setAttribute("stroke-linecap", "round"); pl.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(pl);
+}
+const radius = () => +$("radius").value / (info ? info.display : 0.5);
+function apply() { $("world").style.transform = `translate(${view.x}px,${view.y}px) scale(${view.s})`; }
+function fit() {
+  if (!info) return;
+  const st = $("stage").getBoundingClientRect(), w = info.w * info.display, h = info.h * info.display;
+  if (!st.width) return;
+  view.s = Math.min(st.width / w, st.height / h); view.x = (st.width - w * view.s) / 2; view.y = (st.height - h * view.s) / 2; apply();
+}
+$("stage").addEventListener("wheel", e => {
+  if (!info) return; e.preventDefault();
+  const r = $("stage").getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  const ns = Math.min(20, Math.max(0.1, view.s * Math.exp(-e.deltaY * 0.0015)));
+  view.x = mx - (mx - view.x) * ns / view.s; view.y = my - (my - view.y) * ns / view.s; view.s = ns; apply();
+}, { passive: false });
+function toFull(e) { const r = $("photo").getBoundingClientRect(); return [(e.clientX - r.left) / r.width * info.w, (e.clientY - r.top) / r.height * info.h]; }
+$("stage").addEventListener("contextmenu", e => e.preventDefault());
+$("stage").addEventListener("mousedown", async e => {
+  if (!info || correctionBusy || jobRunning) return;
+  if (e.button === 2 || e.button === 1 || spaceDown) { panning = { x: e.clientX - view.x, y: e.clientY - view.y }; return; }
+  if (e.button !== 0) return;
+  const p = toFull(e);
+  if (e.altKey) {
+    const r = await updateCorrection("/api/edit", { op: "pick", points: [p] });
+    if (r?.picked != null) { sel = r.picked; renderPlants(); renderMarks(); renderStatus(); }
+    return;
+  }
+  if (tool === "piece") { await send("piece", [p]); return; }
+  stroke = [p]; drawStroke();
+});
+window.addEventListener("mousemove", e => {
+  if (panning) { view.x = e.clientX - panning.x; view.y = e.clientY - panning.y; apply(); return; }
+  if (!info || curTab !== "correct") return;
+  const p = toFull(e), c = $("cursor");
+  if (c) { c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r", radius()); c.setAttribute("visibility", tool === "piece" ? "hidden" : "visible"); }
+  if (stroke) { const l = stroke[stroke.length - 1]; if (Math.hypot(p[0] - l[0], p[1] - l[1]) > radius() / 3) { stroke.push(p); drawStroke(); } }
+});
+window.addEventListener("mouseup", async () => {
+  if (panning) { panning = null; return; }
+  if (stroke) { const pts = stroke; stroke = null; await send(tool, pts); drawStroke(); }
+});
+function drawStroke() {
+  const pl = $("strokeline"); if (!pl) return;
+  if (!stroke) { pl.setAttribute("points", ""); return; }
+  pl.setAttribute("points", stroke.map(p => p.join(",")).join(" "));
+  pl.setAttribute("stroke", tool === "remove" ? "rgba(255,255,255,.6)" : info.pots[sel].color);
+  pl.setAttribute("stroke-opacity", .6); pl.setAttribute("stroke-width", 2 * radius());
+}
+async function updateCorrection(path, details = {}) {
+  if (!info || correctionBusy || jobRunning) return null;
+  const image = cur, request = loadRequest;
+  correctionBusy = true;
+  correctionControls();
+  try {
+    const updated = await api(path, { image, ...details });
+    if (cur !== image || request !== loadRequest) return null;
+    info = updated;
+    refresh();
+    return updated;
+  } catch {
+    return null;
+  } finally {
+    correctionBusy = false;
+    correctionControls();
+  }
+}
+function send(op, points) {
+  return updateCorrection("/api/edit", { op, idx: sel, points, radius: radius() });
+}
+function setTool(t) { tool = t; for (const k of ["brush", "piece", "remove"]) $("t-" + k).classList.toggle("on", k === t); }
+$("t-brush").onclick = () => setTool("brush"); $("t-piece").onclick = () => setTool("piece"); $("t-remove").onclick = () => setTool("remove");
+$("undo").onclick = () => updateCorrection("/api/undo");
+$("save").onclick = save;
+async function save() {
+  if (stroke) return;
+  const image = cur;
+  if (!await updateCorrection("/api/save")) return;
+  await loadPhotos();
+  await refreshState();
+  if (cur !== image) return;
+  const next = photos.find(p => p.flagged && !p.done);
+  const status = $("cstatus");
+  if (!next) {
+    status.append(" · All photos checked");
+    return;
+  }
+  const button = document.createElement("button");
+  button.className = "link";
+  button.textContent = "Next photo →";
+  button.onclick = () => openPhoto(next.image);
+  status.append(" · ", button);
+}
+
+window.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" && (e.target.type === "text" || e.target.type === "number")) return;
+  if ($("picker").open) return;
+  if (curTab === "check") { if (e.key === "ArrowLeft") $("qcprev").click(); if (e.key === "ArrowRight") $("qcnext").click(); return; }
+  if (curTab !== "correct") return;
+  if (e.code === "Space" && e.target.tagName !== "BUTTON") { spaceDown = true; e.preventDefault(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); $("undo").click(); return; }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); return; }
+  const k = e.key.toLowerCase();
+  if (k === "b") setTool("brush"); if (k === "p") setTool("piece"); if (k === "r") setTool("remove");
+  if (k === "f") fit();
+  if (k === "h") $("overlay").style.visibility = $("overlay").style.visibility === "hidden" ? "visible" : "hidden";
+  if (k === "[") $("radius").value = +$("radius").value - 2;
+  if (k === "]") $("radius").value = +$("radius").value + 2;
+});
+window.addEventListener("keyup", e => { if (e.code === "Space") spaceDown = false; });
+window.addEventListener("resize", () => { if (curTab === "correct") fit(); });
+window.addEventListener("beforeunload", e => { if (info && info.dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+(async () => {
+  checkSetup();
+  await refreshState();
+  const j = await api("/api/job");
+  if (j.running) pollJob(j.kind === "run" ? "runlog" : "recalclog");
+  if (state.open) showTab("check");
+})();
+</script>
+</body>
+</html>

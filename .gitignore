@@ -1,0 +1,26 @@
+# photos and results (shared separately)
+data/
+photos/
+results/
+*.jpg
+*.jpeg
+*.png
+*.csv
+
+# Screenshot used in the macOS installation instructions
+!/docs/macos-setup-permission.png
+
+# large model checkpoints (the pot detector in models/ is kept)
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.canopysplit/
+venv/
+.ipynb_checkpoints/
+
+# system files
+.DS_Store
+Thumbs.db
