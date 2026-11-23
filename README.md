@@ -96,12 +96,12 @@ photos/
 
 ## Measure a dataset
 
-| Step | What to do |
-| --- | --- |
-| **1. Measure** | Browse to your dataset, enter the pot’s top diameter in cm or inches, and choose your measurements and statistics. Use **Location to save results** to pick an output folder, then click **Run**. |
-| **2. Check** | Review the RGB overlays for pot IDs and leaf assignments. `R2C5` means row 2, column 5. For an aligned pair, select **Aligned NoIR** to check the alignment and see pixels excluded by the contrast filter. |
-| **3. Correct** | For a flagged photo that needs correction, select a plant, then click or paint the visible leaves that belong to it. Click **Save photo** when finished. |
-| **4. Results** | View the tables and choose a measurement and statistic to display one chart at a time. After saving corrections, click **Recalculate with corrections**. |
+| Step | Approach | What to do |
+| --- | --- | --- |
+| **1** | **Measure** | Browse to your dataset, enter the pot’s top diameter in cm or inches, and choose your measurements and statistics. Use **Location to save results** to pick an output folder, then click **Run**. |
+| **2** | **Check** | Review the RGB overlays for pot IDs and leaf assignments. `R2C5` means row 2, column 5. For an aligned pair, select **Aligned NoIR** to check the alignment and see pixels excluded by the contrast filter. |
+| **3** | **Correct** | For a flagged photo that needs correction, select a plant, then click or paint the visible leaves that belong to it. Click **Save photo** when finished. |
+| **4** | **Results** | View the tables and choose a measurement and statistic to display one chart at a time. After saving corrections, click **Recalculate with corrections**. |
 
 In **Measure**, use **Statistics for** to set defaults or customise a measurement.
 Choose mean, median, minimum, or maximum, and enter up to three percentiles
