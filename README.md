@@ -115,9 +115,6 @@ recalculation. If you measure replacement photos, choose a new output folder.
 
 These screenshots follow one example run using synthetic plant images.
 
-<details>
-<summary>View the four workflow screens</summary>
-
 **1. Measure** shows the dataset folder, pot diameter, and statistics options.
 
 ![Measure tab with an example dataset, pot diameter, and summary statistics options](docs/screenshots/measure.png)
@@ -133,8 +130,6 @@ These screenshots follow one example run using synthetic plant images.
 **4. Results** shows a colour index across experiment days and links to download the per-plant and summary CSVs.
 
 ![Results tab showing CSV download links, group statistics, and a VARI chart over time](docs/screenshots/results.png)
-
-</details>
 
 ## Results
 
