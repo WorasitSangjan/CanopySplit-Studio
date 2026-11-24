@@ -47,9 +47,9 @@ If macOS asks you to approve the downloaded launcher, follow
 
 | Fresh installation | Apple silicon Mac | 64-bit Windows |
 | --- | ---: | ---: |
-| Source ZIP, including the pot detector | 19 MB | 19 MB |
+| Source ZIP, including the pot detector | About 21 MB | About 21 MB |
 | Additional download after clicking **Install** | About 314 MB | About 354 MB |
-| **Total download** | **About 333 MB** | **About 373 MB** |
+| **Total download** | **About 335 MB** | **About 375 MB** |
 | Installed folder, including package cache | About 2.2 GB | About 1.2–2.2 GB |
 
 Allow about **2.5 GB of free disk space** for setup, plus space for your photos
@@ -110,6 +110,31 @@ between 0 and 100 if needed. Use **Use defaults** to remove a custom selection.
 To reopen a run, choose **Measure → Open saved results → Browse…**. CanopySplit
 opens it in **Check**. Keep the original photos accessible for corrections and
 recalculation. If you measure replacement photos, choose a new output folder.
+
+## CanopySplit in action
+
+These screenshots follow one example run using synthetic plant images.
+
+<details>
+<summary>View the four workflow screens</summary>
+
+**1. Measure** shows the dataset folder, pot diameter, and statistics options.
+
+![Measure tab with an example dataset, pot diameter, and summary statistics options](docs/screenshots/measure.png)
+
+**2. Check** shows numbered pots and colour-coded leaf assignments. Red labels mark plants flagged for review.
+
+![Check tab showing numbered pots and overlapping leaves with colour-coded assignments](docs/screenshots/check.png)
+
+**3. Correct** shows a selected plant and the brush tool for fixing leaf assignments.
+
+![Correct tab showing a flagged plant selected in the leaf editor](docs/screenshots/correct.png)
+
+**4. Results** shows a colour index across experiment days and links to download the per-plant and summary CSVs.
+
+![Results tab showing CSV download links, group statistics, and a VARI chart over time](docs/screenshots/results.png)
+
+</details>
 
 ## Results
 

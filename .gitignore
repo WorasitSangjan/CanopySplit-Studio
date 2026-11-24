@@ -7,8 +7,9 @@ results/
 *.png
 *.csv
 
-# Screenshot used in the macOS installation instructions
+# Screenshots used in the README
 !/docs/macos-setup-permission.png
+!/docs/screenshots/*.png
 
 # large model checkpoints (the pot detector in models/ is kept)
 *.pth
