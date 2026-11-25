@@ -7,7 +7,7 @@
 [![Interactive review](https://img.shields.io/badge/Review-Interactive-176b64)](#measure-a-dataset)
 ![Science plant phenotyping](https://img.shields.io/badge/Science-Plant_phenotyping-3b6e35)
 
-CanopySplit measures visible leaf area and colour for individual potted plants
+CanopySplit measures visible leaf area and color for individual potted plants
 from overhead photos. It uses YOLO26s to find pots and geodesic leaf assignment
 to separate visible foliage. It runs on your computer and opens in your browser.
 You can review the automatic results and correct flagged leaf assignments by hand.
@@ -96,7 +96,7 @@ photos/
 - **`group1`** identifies plants photographed together (`treatment` in the CSV).
   Give each group its own ID and use it across days. Names such as `bench2` and
   `greenhouseA` work too.
-- **RGB** is the colour photo. Use one per group and day.
+- **RGB** is the color photo. Use one per group and day.
 - **NIR** is an optional near-infrared or NoIR photo. Match the RGB photo’s day
   and group ID. An aligned pair can provide relative NIR and NDVI measurements.
 
@@ -109,7 +109,7 @@ photos/
 | **3** | **Correct** | For a flagged photo that needs correction, select a plant, then click or paint the visible leaves that belong to it. Click **Save photo** when finished. |
 | **4** | **Results** | View the tables and choose a measurement and statistic to display one chart at a time. After saving corrections, click **Recalculate with corrections**. |
 
-In **Measure**, use **Statistics for** to set defaults or customise a measurement.
+In **Measure**, use **Statistics for** to set defaults or customize a measurement.
 Choose mean, median, minimum, or maximum, and enter up to three percentiles
 between 0 and 100 if needed. Use **Use defaults** to remove a custom selection.
 
@@ -134,7 +134,7 @@ and Results show a synthetic example.
 
 ![Correct tab zoomed in on crossing maize leaves, with Brush active and pot R3C4 selected](docs/screenshots/correct.png)
 
-**4. Results** shows a colour index across experiment days and links to download the per-plant and summary CSVs.
+**4. Results** shows a color index across experiment days and links to download the per-plant and summary CSVs.
 
 ![Results tab showing CSV download links, group statistics, and a VARI chart over time](docs/screenshots/results.png)
 
@@ -158,8 +158,8 @@ Click **?** beside a measurement selector for its definition.
 
 | Measurement | What it describes |
 | --- | --- |
-| **Leaf area** | The area of visible leaves in the overhead image. The pot diameter provides the scale for cm² or in². |
-| **Colour and greenness** | Relative RGB signals and indices such as VARI, GLI, NGRDI, and ExG. |
+| **Leaf area** | The area of visible leaves in the overhead image. The pot diameter provides the scale for cm²customize|
+| **Color and greenness** | Relative RGB signals and indices such as VARI, GLI, NGRDI, and ExG. |
 | **Visible damage** | The area or share of visible leaves classified by an RGB colour rule. Lighting and natural pigmentation can affect it. |
 | **Relative NIR and NDVI** | Estimates from usable pixels in an aligned RGB and NoIR pair. Green-tissue and damaged-tissue NDVI use the same index on different sets of pixels classified by the RGB photo. |
 
@@ -174,9 +174,9 @@ Click **?** beside a measurement selector for its definition.
 | `leaf_area_cm2` or `leaf_area_in2` | Projected leaf area scaled using the pot’s top diameter. |
 | `leaf_area_pot_frac` | Visible leaf area divided by the area of the detected pot’s bounding box. |
 
-**RGB colour and greenness**
+**RGB color and greenness**
 
-Here `R`, `G`, and `B` are signals standardised against a white reference.
+Here `R`, `G`, and `B` are signals standardized against a white reference.
 The indices are calculated per pixel and averaged across each plant’s visible leaves.
 
 | Column | Meaning |
@@ -189,16 +189,16 @@ The indices are calculated per pixel and averaged across each plant’s visible 
 
 **Visible damage**
 
-The default colour rule classifies leaf pixels with an Excess Green score above
+The default color rule classifies leaf pixels with an Excess Green score above
 20 on the original 8-bit RGB values as green. The other leaf pixels count toward
-visible damage under that rule. The exported `ExG` uses standardised RGB.
+visible damage under that rule. The exported `ExG` uses standardized RGB.
 
 | Column | Meaning |
 | --- | --- |
 | `damaged_frac` | Area classified as damaged divided by the full visible leaf area. A value of 0.20 means 20%. |
 | `damaged_area_cm2` or `damaged_area_in2` | Area classified as damaged in the selected square unit. |
-| `dmg_yellow_frac`, `dmg_pinkred_frac`, `dmg_brown_frac` | Area for each colour class divided by the full visible leaf area. |
-| `dmg_yellow_area_pot`, `dmg_pinkred_area_pot`, `dmg_brown_area_pot` | Area for each colour class divided by the area of the detected pot’s bounding box. |
+| `dmg_yellow_frac`, `dmg_pinkred_frac`, `dmg_brown_frac` | Area for each color class divided by the full visible leaf area. |
+| `dmg_yellow_area_pot`, `dmg_pinkred_area_pot`, `dmg_brown_area_pot` | Area for each color class divided by the area of the detected pot’s bounding box. |
 
 **Relative NIR and NDVI**
 
@@ -207,7 +207,7 @@ NDVI compares estimated near-infrared and red signals using
 
 | Column | Meaning |
 | --- | --- |
-| `NIR_rel` | Mean estimated near-infrared signal, adjusted for visible light and standardised using a white reference. |
+| `NIR_rel` | Mean estimated near-infrared signal, adjusted for visible light and standardized using a white reference. |
 | `NDVI` | Mean relative NDVI over all usable leaf pixels. |
 | `NDVI_green_tissue` | Mean relative NDVI over usable leaf pixels classified as green by the RGB rule. |
 | `NDVI_damaged_tissue` | Mean relative NDVI over usable leaf pixels classified as damaged by the RGB rule. |
@@ -243,11 +243,11 @@ can carry into a rerun when the photos and pot positions still match.
 ## Limitations
 
 - **Hidden leaves.** CanopySplit measures only what is visible from above.
-  Review assignments when neighbouring foliage touches or overlaps.
+  Review assignments when neighboring foliage touches or overlaps.
 - **Pot positions.** The grid fitter expects four rows by default. Check IDs
   when the framing changes or a row or column is missing.
-- **Colour reference.** Calibrated colour indices require a usable white
-  background reference. The colour card in the original photos had glare and
+- **Colour reference.** Calibrated color indices require a usable white
+  background reference. The color card in the original photos had glare and
   was unused.
 - **Relative NDVI.** Treat these values as relative to your camera and lighting
   setup. The original NoIR camera used automatic exposure and had no filter.
@@ -272,7 +272,7 @@ shifts between cameras still need visual review.
 
 The pipeline detects pots with [YOLO26s](models/README.md), fits a row and column
 grid, and assigns segmented RGB leaf pixels to plants using paths through the
-foreground. Colour standardisation uses the camera tone curve and stable
+foreground. Color standardization uses the camera tone curve and stable
 background regions to match images to a group reference. The pipeline then
 measures each plant, flags overlap for review, and writes previews and summaries.
 
@@ -289,7 +289,7 @@ python run_pipeline.py --out-dir ../results/my_dataset --recalculate
 ```
 
 - Use `--photos` with `--recalculate` if the original photos were moved.
-- The diameter argument takes centimetres. Use `--area-unit in` for square-inch output.
+- The diameter argument takes centimeters. Use `--area-unit in` for square-inch output.
 - Use `--summary-stats mean median` and `--percentiles 10 50 90` to choose statistics.
   Pass either option without values to omit that set.
 - Use `--skip-existing` to reuse automatic detections and masks when the RGB
@@ -300,14 +300,14 @@ python run_pipeline.py --out-dir ../results/my_dataset --recalculate
 
 ```text
 app.py, app.html   local browser app
-assets/            interface font and its licence
+assets/            interface font and its license
 docs/              setup screenshot
 pipeline/          measurement and review steps
 models/            trained pot detector
 analysis/          optional checks for the original study
 ```
 
-Use `analysis/validate_ndvi.py --help` to see the colour standardisation and NDVI
+Use `analysis/validate_ndvi.py --help` to see the color standardization and NDVI
 checks, and `analysis/compare_indices.py --help` for the maize study comparison.
 
 </details>
@@ -317,9 +317,9 @@ checks, and `analysis/compare_indices.py --help` for the maize study comparison.
 - Gitelson AA, Kaufman YJ, Stark R, Rundquist D (2002). Novel algorithms for remote estimation of vegetation fraction. *Remote Sensing of Environment*, 80, 76–87. [Paper](https://doi.org/10.1016/S0034-4257(01)00289-9)
 - Glenn DM, Tabb A (2019). Evaluation of five methods to measure normalized difference vegetation index (NDVI) in apple and citrus. *International Journal of Fruit Science*, 19, 191–210. [Paper](https://doi.org/10.1080/15538362.2018.1502720)
 - Schott JR, Salvaggio C, Volchok WJ (1988). Radiometric scene normalization using pseudoinvariant features. *Remote Sensing of Environment*, 26, 1–16. [Paper](https://doi.org/10.1016/0034-4257(88)90116-2)
-- Stamford JD, Vialet-Chabrand S, Cameron I, Lawson T (2023). Development of an accurate low cost NDVI imaging system for assessing plant health. *Plant Methods*, 19, 9. [Paper](https://doi.org/10.1186/s13007-023-00981-8)
+- Stamford JD, Vialet-Chabrand S, Cameron I, Lawson T (2023). Development of an accurate low-cost NDVI imaging system for assessing plant health. *Plant Methods*, 19, 9. [Paper](https://doi.org/10.1186/s13007-023-00981-8)
 
-## Citation and licence
+## Citation and license
 
 A paper citation will be added if the accompanying study is published.
 
