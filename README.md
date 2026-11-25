@@ -22,8 +22,6 @@ another plant type or camera setup.
 
 https://github.com/user-attachments/assets/6efa36af-7fc1-4435-b735-068cd08cf0e5
 
-[Download the 2½-minute silent walkthrough (MP4)](https://github.com/WorasitSangjan/CanopySplit-Studio/releases/download/v0.1.0-beta.1/CanopySplit-Studio-Walkthrough.mp4)
-
 ## Install and open
 
 1. On GitHub, choose **Code → Download ZIP**. On Mac, double-click the ZIP in
