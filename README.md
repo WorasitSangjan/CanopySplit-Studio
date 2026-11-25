@@ -18,6 +18,10 @@ another plant type or camera setup.
 
 [Install](#install-and-open) · [Prepare photos](#prepare-your-photos) · [Measure](#measure-a-dataset) · [Results](#results)
 
+## Video walkthrough
+
+https://github.com/user-attachments/assets/6efa36af-7fc1-4435-b735-068cd08cf0e5
+
 [Download the 2½-minute silent walkthrough (MP4)](https://github.com/WorasitSangjan/CanopySplit-Studio/releases/download/v0.1.0-beta.1/CanopySplit-Studio-Walkthrough.mp4)
 
 ## Install and open
@@ -303,7 +307,7 @@ models/            trained pot detector
 analysis/          optional checks for the original study
 ```
 
-Use `analysis/validate_ndvi.py --help` to see the colour standardisation and NDVI
+Use `analysis/validate_ndvi.py --help` to see the color standardization and NDVI
 checks, and `analysis/compare_indices.py --help` for the maize study comparison.
 
 </details>
