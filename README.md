@@ -307,7 +307,7 @@ models/            trained pot detector
 analysis/          optional checks for the original study
 ```
 
-Use `analysis/validate_ndvi.py --help` to see the color standardization and NDVI
+Use `analysis/validate_ndvi.py --help` to see the colour standardisation and NDVI
 checks, and `analysis/compare_indices.py --help` for the maize study comparison.
 
 </details>
