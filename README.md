@@ -20,7 +20,7 @@ another plant type or camera setup.
 
 ## Video walkthrough
 
-https://github.com/user-attachments/assets/6efa36af-7fc1-4435-b735-068cd08cf0e5
+https://github.com/user-attachments/assets/2b668454-798f-4275-adb5-99c4879ace2c
 
 ## Install and open
 
