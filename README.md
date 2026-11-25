@@ -18,6 +18,8 @@ another plant type or camera setup.
 
 [Install](#install-and-open) · [Prepare photos](#prepare-your-photos) · [Measure](#measure-a-dataset) · [Results](#results)
 
+[Download the 2½-minute silent walkthrough (MP4)](https://github.com/WorasitSangjan/CanopySplit-Studio/releases/download/v0.1.0-beta.1/CanopySplit-Studio-Walkthrough.mp4)
+
 ## Install and open
 
 1. On GitHub, choose **Code → Download ZIP**. On Mac, double-click the ZIP in
@@ -113,19 +115,20 @@ recalculation. If you measure replacement photos, choose a new output folder.
 
 ## CanopySplit in action
 
-These screenshots follow one example run using synthetic plant images.
+Check and Correct use real maize photos from the video walkthrough. Measure
+and Results show a synthetic example.
 
 **1. Measure** shows the dataset folder, pot diameter, and statistics options.
 
 ![Measure tab with an example dataset, pot diameter, and summary statistics options](docs/screenshots/measure.png)
 
-**2. Check** shows numbered pots and colour-coded leaf assignments. Red labels mark plants flagged for review.
+**2. Check** shows numbered pots and colour-coded leaf assignments in the RGB overlay. Red labels mark plants flagged for review.
 
-![Check tab showing numbered pots and overlapping leaves with colour-coded assignments](docs/screenshots/check.png)
+![Check tab showing numbered pots, colour-coded maize leaves, and two red labels marking plants flagged for review](docs/screenshots/check.png)
 
-**3. Correct** shows a selected plant and the brush tool for fixing leaf assignments.
+**3. Correct** shows a close-up of two crossing leaves after the Brush tool reassigns part of a leaf to pot R3C4.
 
-![Correct tab showing a flagged plant selected in the leaf editor](docs/screenshots/correct.png)
+![Correct tab zoomed in on crossing maize leaves, with Brush active and pot R3C4 selected](docs/screenshots/correct.png)
 
 **4. Results** shows a colour index across experiment days and links to download the per-plant and summary CSVs.
 
